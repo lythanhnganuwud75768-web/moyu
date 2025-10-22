@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>摸鱼计算器 · 高级版</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+  <div class="backdrop-blur-xl bg-white/30 shadow-2xl rounded-2xl p-8 w-[380px]">
+    <h1 class="text-2xl font-bold text-white drop-shadow mb-6 text-center">🐟 摸鱼计算器 Pro+</h1>
+
+    <!-- 月薪 -->
+    <div class="mb-6">
+      <label class="block text-white mb-2">💰 月薪</label>
+      <input type="range" min="3000" max="50000" step="1000" value="10000"
+             id="salarySlider"
+             class="w-full accent-pink-500">
+      <p class="text-white mt-1 text-center">当前月薪：<span id="salaryValue" class="font-bold">10000</span> 元</p>
+    </div>
+
+    <!-- 工时 + 上班制度 -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="bg-white/20 rounded-xl p-3 text-center text-white">
+        <p class="mb-2">⌛ 工时</p>
+        <input type="number" value="8" id="workHours"
+               class="w-16 text-center rounded-lg border-0 p-1 text-black">
+      </div>
+      <div class="bg-white/20 rounded-xl p-3 text-center text-white">
+        <p class="mb-2">📅 制度</p>
+        <div class="flex justify-center gap-2">
+          <button class="px-3 py-1 rounded-lg bg-pink-500 text-white" onclick="setSchedule('double')">双休</button>
+          <button class="px-3 py-1 rounded-lg bg-purple-500 text-white" onclick="setSchedule('bigSmall')">大小周</button>
+          <button class="px-3 py-1 rounded-lg bg-blue-500 text-white" onclick="setSchedule('single')">单休</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 摸鱼方式 -->
+    <div class="mb-6 text-center">
+      <p class="text-white mb-2">选择摸鱼方式</p>
+      <div class="flex justify-center gap-3">
+        <button onclick="setMode('刷手机📱')" class="p-3 rounded-full bg-white/30 hover:scale-110">📱</button>
+        <button onclick="setMode('喝咖啡☕')" class="p-3 rounded-full bg-white/30 hover:scale-110">☕</button>
+        <button onclick="setMode('打游戏🎮')" class="p-3 rounded-full bg-white/30 hover:scale-110">🎮</button>
+        <button onclick="setMode('发呆😵')" class="p-3 rounded-full bg-white/30 hover:scale-110">😵</button>
+      </div>
+    </div>
+
+    <!-- 摸鱼计时器 -->
+    <div class="text-center text-white">
+      <p id="timer" class="text-lg font-bold">计时器未启动</p>
+      <p id="money" class="text-xl font-bold text-yellow-300 mt-2"></p>
+      <div class="mt-4 flex justify-center gap-3">
+        <button onclick="startFishing()" class="px-4 py-2 rounded-lg bg-green-500">开始</button>
+        <button onclick="pauseFishing()" class="px-4 py-2 rounded-lg bg-yellow-500">暂停</button>
+        <button onclick="stopFishing()" class="px-4 py-2 rounded-lg bg-red-500">停止</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let salary = 10000, schedule="double", hourlyWage=0;
+    let timerInterval, startTime, elapsedPaused=0;
+    let fishMode="自由摸鱼";
+
+    document.getElementById("salarySlider").oninput = function() {
+      salary = this.value;
+      document.getElementById("salaryValue").textContent = salary;
+    }
+
+    function setSchedule(type){ schedule=type; }
+    function setMode(mode){ fishMode=mode; }
+
+    function startFishing(){
+      hourlyWage = salary / 22 / parseInt(document.getElementById("workHours").value); // 简化算法
+      startTime = Date.now() - elapsedPaused;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function pauseFishing(){
+      clearInterval(timerInterval);
+      elapsedPaused = Date.now() - startTime;
+      document.getElementById("timer").innerText = "⏸ 摸鱼已暂停";
+    }
+
+    function stopFishing(){
+      clearInterval(timerInterval);
+      elapsedPaused = 0;
+      document.getElementById("timer").innerText = "🐟 摸鱼结束";
+      document.getElementById("money").innerText = "";
+    }
+
+    function updateTimer(){
+      const elapsed = (Date.now() - startTime)/1000;
+      const h = Math.floor(elapsed/3600);
+      const m = Math.floor((elapsed%3600)/60);
+      const s = Math.floor(elapsed%60);
+      const money = (elapsed/3600*hourlyWage).toFixed(2);
+
+      document.getElementById("timer").innerText = `🐟 已摸鱼 ${h}时${m}分${s}秒 (${fishMode})`;
+      document.getElementById("money").innerText = `💰 白拿: ${money} 元`;
+    }
+  </script>
+</body>
+</html>
